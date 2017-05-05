@@ -1,0 +1,63 @@
+package com.mlm.bitcoin;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
+import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.Named;
+import com.mlm.bitcoin.dao.BitcoinDao;
+import com.mlm.bitcoin.dto.CurrencyDTO;
+import com.mlm.bitcoin.response.HistoryResponse;
+
+/**
+ * 
+ */
+@Api(name = "bitcoin", version = "v1")
+public class BitcoinRest {
+
+	final String createTableSql = "CREATE TABLE IF NOT EXISTS devices ( id INT NOT NULL "
+			+ "AUTO_INCREMENT, token VARCHAR(100) NOT NULL, platform VARCHAR(20) NOT NULL, timestamp DATETIME NOT NULL, "
+			+ "PRIMARY KEY (id) )";
+	final String insertDeviceSql = "INSERT INTO devices (token, platform, timestamp) VALUES (?, ?, NOW())";
+
+	@ApiMethod(name = "insertDevice", httpMethod = "post", path = "push")
+	public Callback insertDevice(RequestRegisterDevice request) {
+		Callback response = new Callback();
+		StringBuilder responseBuilder = new StringBuilder();
+		try {
+			Connection conn = DbUtils.getConnection();
+			// conn.createStatement().executeUpdate(createTableSql);
+			PreparedStatement statementCreateVisit = conn.prepareStatement(insertDeviceSql);
+			statementCreateVisit.setString(1, request.getToken());
+			statementCreateVisit.setString(2, request.getPlatform());
+			statementCreateVisit.executeUpdate();
+			conn.close();
+		} catch (SQLException e) {
+			responseBuilder.append("ERROR " + e.getMessage() + "\n");
+		}
+		if (responseBuilder.length() == 0) {
+			responseBuilder
+					.append("Dispositivo " + request.getToken() + " registrado, plataforma " + request.getPlatform());
+			response.setSuccess(true);
+		}
+
+		response.setMessage(responseBuilder.toString());
+		return response;
+	}
+
+	@ApiMethod(name = "history", httpMethod = ApiMethod.HttpMethod.GET, path = "history")
+	public HistoryResponse getHistory(@Named("days") int days) {
+		List<CurrencyDTO> list = BitcoinDao.selectHistory(days);
+		HistoryResponse response = new HistoryResponse();
+		if (list != null && !list.isEmpty()) {
+			response.setSuccess(true);
+			response.setHistory(list);
+		} else {
+			response.setSuccess(false);
+		}
+		return response;
+	}
+}
