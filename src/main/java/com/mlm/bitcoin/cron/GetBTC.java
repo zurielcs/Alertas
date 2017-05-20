@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.cron;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.repackaged.com.google.gson.Gson;
+import com.mlm.bitcoin.beans.BitsoPayload;
+import com.mlm.bitcoin.beans.BitsoTicker;
+import com.mlm.bitcoin.commons.Utils;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.service.BitcoinService;
 
@@ -28,19 +31,29 @@ public class GetBTC extends HttpServlet {
 			List<BitsoPayload> lst = obj.getPayload();
 			BitsoPayload bitcoin = null;
 			BitsoPayload ether = null;
+			BitsoPayload ripple = null;
 			for (BitsoPayload bitsoPayload : lst) {
-				if (bitsoPayload.getBook().toUpperCase().contains("BTC"))
+				switch(bitsoPayload.getBook().toLowerCase()){
+				case "btc_mxn":
 					bitcoin = bitsoPayload;
-				else
+					break;
+				case "eth_mxn":
 					ether = bitsoPayload;
+					break;
+				case "xrp_mxn":
+					ripple = bitsoPayload;
+					break;
+				}
 			}
 			response.append("<br>bitcoin " + bitcoin.getLast());
 			response.append("<br>ether " + ether.getLast());
+			response.append("<br>ripple " + ether.getLast());
 
-			BitcoinService.sendPush(Float.parseFloat(bitcoin.getLast()), Float.parseFloat(ether.getLast()), response);
+			BitcoinService.sendPush(bitcoin, ether, ripple, response);
 
 			BitcoinDao.insertBitcoin(bitcoin);
 			BitcoinDao.insertBitcoin(ether);
+			BitcoinDao.insertBitcoin(ripple);
 			BitcoinDao.insertBitacora("RESPONSE GETBTC", response.toString().replaceAll("<br>", " - "));
 		} catch (Exception e) {
 			response.append("ERROR " + e.toString());

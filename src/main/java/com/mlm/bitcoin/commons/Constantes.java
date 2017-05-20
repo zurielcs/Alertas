@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.commons;
 
 public class Constantes {
 	public static final String URL_FIREBASE_PUSH = "https://fcm.googleapis.com/fcm/send";
@@ -10,4 +10,5 @@ public class Constantes {
 	
 	public static final String CURRENCY_BTC = "btc_mxn"; 
 	public static final String CURRENCY_ETH = "eth_mxn"; 
+	public static final String CURRENCY_RIP = "xrp_mxn"; 
 }

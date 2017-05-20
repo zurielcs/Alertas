@@ -6,12 +6,21 @@
 
 	<servlet>
 		<servlet-name>BitcoinCronServlet</servlet-name>
-		<servlet-class>com.mlm.bitcoin.GetBTC</servlet-class>
+		<servlet-class>com.mlm.bitcoin.cron.GetBTC</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>BitcoinCronServlet</servlet-name>
 		<url-pattern>/cron/getbtc</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+        <servlet-name>SystemServiceServlet</servlet-name>
+        <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+        <init-param>
+            <param-name>services</param-name>
+            <param-value>com.mlm.bitcoin.rest.BitcoinRest</param-value>
+        </init-param>
+    </servlet>
 	<servlet-mapping>
 		<servlet-name>SystemServiceServlet</servlet-name>
 		<url-pattern>/_ah/spi/*</url-pattern>

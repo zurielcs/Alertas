@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.beans;
 
 import java.util.List;
 

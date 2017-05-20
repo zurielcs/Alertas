@@ -1,8 +1,7 @@
-package com.mlm.bitcoin.response;
+package com.mlm.bitcoin.beans;
 
 import java.util.List;
 
-import com.mlm.bitcoin.Callback;
 import com.mlm.bitcoin.dto.CurrencyDTO;
 
 public class HistoryResponse extends Callback {

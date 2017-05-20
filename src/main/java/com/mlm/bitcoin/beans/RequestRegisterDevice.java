@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.beans;
 
 public class RequestRegisterDevice {
 	private String token;

@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.rest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,9 +8,12 @@ import java.util.List;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
+import com.mlm.bitcoin.beans.Callback;
+import com.mlm.bitcoin.beans.HistoryResponse;
+import com.mlm.bitcoin.beans.RequestRegisterDevice;
+import com.mlm.bitcoin.commons.DbUtils;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.dto.CurrencyDTO;
-import com.mlm.bitcoin.response.HistoryResponse;
 
 /**
  * 

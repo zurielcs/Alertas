@@ -1,4 +1,4 @@
-package com.mlm.bitcoin;
+package com.mlm.bitcoin.commons;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
