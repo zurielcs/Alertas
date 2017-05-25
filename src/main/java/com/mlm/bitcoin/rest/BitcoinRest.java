@@ -2,16 +2,17 @@ package com.mlm.bitcoin.rest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.DefaultValue;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.config.Nullable;
 import com.mlm.bitcoin.beans.Callback;
 import com.mlm.bitcoin.beans.HistoryResponse;
 import com.mlm.bitcoin.beans.RequestRegisterDevice;
-import com.mlm.bitcoin.commons.DbUtils;
+import com.mlm.bitcoin.commons.DataSource;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.dto.CurrencyDTO;
 
@@ -31,14 +32,14 @@ public class BitcoinRest {
 		Callback response = new Callback();
 		StringBuilder responseBuilder = new StringBuilder();
 		try {
-			Connection conn = DbUtils.getConnection();
+			Connection conn = DataSource.getInstance().getConnection();
 			// conn.createStatement().executeUpdate(createTableSql);
 			PreparedStatement statementCreateVisit = conn.prepareStatement(insertDeviceSql);
 			statementCreateVisit.setString(1, request.getToken());
 			statementCreateVisit.setString(2, request.getPlatform());
 			statementCreateVisit.executeUpdate();
 			conn.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			responseBuilder.append("ERROR " + e.getMessage() + "\n");
 		}
 		if (responseBuilder.length() == 0) {
@@ -52,8 +53,8 @@ public class BitcoinRest {
 	}
 
 	@ApiMethod(name = "history", httpMethod = ApiMethod.HttpMethod.GET, path = "history")
-	public HistoryResponse getHistory(@Named("days") int days) {
-		List<CurrencyDTO> list = BitcoinDao.selectHistory(days);
+	public HistoryResponse getHistory(@Named("days") @DefaultValue("0") int days, @Named("hours") @DefaultValue("0") int hours) {
+		List<CurrencyDTO> list = BitcoinDao.selectHistory(days, hours);
 		HistoryResponse response = new HistoryResponse();
 		if (list != null && !list.isEmpty()) {
 			response.setSuccess(true);

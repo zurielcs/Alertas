@@ -77,7 +77,7 @@ public class BitcoinService {
 		}
 
 		for (String pushMsg : lstPush) {
-			BitcoinDao.insertBitacora("PUSH", pushMsg);
+//			BitcoinDao.insertBitacora("PUSH", pushMsg);
 			List<DeviceDTO> lst = BitcoinDao.selectDevices();
 			for (DeviceDTO device : lst) {
 				if (device.getPlatform().toUpperCase().contains("IOS")) {

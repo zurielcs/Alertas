@@ -54,7 +54,7 @@ public class GetBTC extends HttpServlet {
 			BitcoinDao.insertBitcoin(bitcoin);
 			BitcoinDao.insertBitcoin(ether);
 			BitcoinDao.insertBitcoin(ripple);
-			BitcoinDao.insertBitacora("RESPONSE GETBTC", response.toString().replaceAll("<br>", " - "));
+//			BitcoinDao.insertBitacora("RESPONSE GETBTC", response.toString().replaceAll("<br>", " - "));
 		} catch (Exception e) {
 			response.append("ERROR " + e.toString());
 		}
