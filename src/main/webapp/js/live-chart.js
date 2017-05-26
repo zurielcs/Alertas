@@ -85,6 +85,7 @@ function createLiveChart(type, json){
                 	if(item.book.indexOf(type) != -1) {
                 		var time = new Date(item.created_at).getTime();
                         var y = parseFloat(item.value);
+                		data.push({x: time - (1000 * 60) , y });
                 		data.push({x: time , y });
 //                		for(i=0; i < 30 && time + i * 1000 * 60 * 2 < now; i++)
 //	                		data.push({x: time + i * 1000 * 60 * 2 , y });
@@ -98,7 +99,7 @@ function createLiveChart(type, json){
 }
 var chartArray = [];
 
-$.getJSON('https://bitcoin-164116.appspot.com/_ah/api/bitcoin/v1/history?hours=1', function (json) {
+$.getJSON('https://bitcoin-164116.appspot.com/_ah/api/bitcoin/v1/history?hours=4', function (json) {
 	$(document).ready(function () {
 	    Highcharts.setOptions({
 	        global: {

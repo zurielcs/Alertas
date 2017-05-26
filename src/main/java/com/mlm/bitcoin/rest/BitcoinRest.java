@@ -8,7 +8,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.DefaultValue;
 import com.google.api.server.spi.config.Named;
-import com.google.api.server.spi.config.Nullable;
 import com.mlm.bitcoin.beans.Callback;
 import com.mlm.bitcoin.beans.HistoryResponse;
 import com.mlm.bitcoin.beans.RequestRegisterDevice;

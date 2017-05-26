@@ -29,7 +29,7 @@ public class BitcoinDao {
 	private final static String selectMax = "SELECT COALESCE(time_to_sec(timediff(now(), max(timestamp)))/60/60, 999) hrs FROM bitcoin where currency = ? and bid >= ?";
 
 	private final static String selectLastDays = "select truncate(avg(last), 2) value, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') time from bitcoin b where DATE(timestamp) >= DATE_ADD(CURDATE(), INTERVAL - ? DAY) group by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') desc";
-	private final static String selectLastHours = "select last value, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from bitcoin b where timestamp >= DATE_SUB(CURDATE(), INTERVAL ? HOUR) order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc;";
+	private final static String selectLastHours = "select last value, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from bitcoin b where timestamp >= NOW() - INTERVAL ? HOUR order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
 
 	public static List<DeviceDTO> selectDevices() {
 		List<DeviceDTO> list = new ArrayList<>();
