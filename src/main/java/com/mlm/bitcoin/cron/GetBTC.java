@@ -49,7 +49,7 @@ public class GetBTC extends HttpServlet {
 			response.append("<br>ether " + ether.getLast());
 			response.append("<br>ripple " + ether.getLast());
 
-			BitcoinService.sendPush(bitcoin, ether, ripple, response);
+//			BitcoinService.sendPush(bitcoin, ether, ripple, response);
 
 			BitcoinDao.insertBitcoin(bitcoin);
 			BitcoinDao.insertBitcoin(ether);

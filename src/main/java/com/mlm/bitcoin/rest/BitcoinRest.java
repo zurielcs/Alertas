@@ -37,6 +37,7 @@ public class BitcoinRest {
 			statementCreateVisit.setString(1, request.getToken());
 			statementCreateVisit.setString(2, request.getPlatform());
 			statementCreateVisit.executeUpdate();
+			statementCreateVisit.close();
 			conn.close();
 		} catch (Exception e) {
 			responseBuilder.append("ERROR " + e.getMessage() + "\n");

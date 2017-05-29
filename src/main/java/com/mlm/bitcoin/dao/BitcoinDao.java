@@ -42,6 +42,8 @@ public class BitcoinDao {
 				String token = rs.getString("token");
 				list.add(new DeviceDTO(platform, token));
 			}
+			ps.close();
+			rs.close();
 			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,6 +68,7 @@ public class BitcoinDao {
 			ps.setFloat(5, low);
 			ps.setString(6, bitsoPayload.getBook());
 			ps.executeUpdate();
+			ps.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -85,6 +88,7 @@ public class BitcoinDao {
 			ps.setString(1, tipoEvento);
 			ps.setString(2, evento);
 			ps.executeUpdate();
+			ps.close();
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -119,6 +123,8 @@ public class BitcoinDao {
 			if (rs.next()) {
 				res = rs.getFloat("hrs");
 			}
+			ps.close();
+			rs.close();
 			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -148,6 +154,8 @@ public class BitcoinDao {
 				dto.setCreated_at(rs.getString("time") + ":00:00+00:00");
 				res.add(dto);
 			}
+			ps.close();
+			rs.close();
 			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
