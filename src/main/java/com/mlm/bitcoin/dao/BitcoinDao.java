@@ -12,6 +12,7 @@ import java.util.List;
 import com.mlm.bitcoin.beans.BitsoPayload;
 import com.mlm.bitcoin.commons.Constantes;
 import com.mlm.bitcoin.commons.DataSource;
+import com.mlm.bitcoin.commons.DbUtils;
 import com.mlm.bitcoin.dto.CurrencyDTO;
 import com.mlm.bitcoin.dto.DeviceDTO;
 
@@ -34,7 +35,8 @@ public class BitcoinDao {
 	public static List<DeviceDTO> selectDevices() {
 		List<DeviceDTO> list = new ArrayList<>();
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			PreparedStatement ps = conn.prepareCall(selectDevices);
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -54,7 +56,8 @@ public class BitcoinDao {
 	public static boolean insertBitcoin(BitsoPayload bitsoPayload) {
 		// conn.createStatement().executeUpdate(createTableSql);
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			PreparedStatement ps = conn.prepareStatement(insertDeviceSql);
 			float last = Float.parseFloat(bitsoPayload.getLast());
 			float bid = Float.parseFloat(bitsoPayload.getBid());
@@ -83,20 +86,15 @@ public class BitcoinDao {
 	public static boolean insertBitacora(String tipoEvento, String evento) {
 		// conn.createStatement().executeUpdate(createTableSql);
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			PreparedStatement ps = conn.prepareStatement(insertBitacoraSql);
 			ps.setString(1, tipoEvento);
 			ps.setString(2, evento);
 			ps.executeUpdate();
 			ps.close();
 			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} catch (PropertyVetoException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -114,7 +112,8 @@ public class BitcoinDao {
 			sql = selectMax;
 		}
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, currency);
 			ps.setFloat(2, currentValue);
@@ -135,7 +134,8 @@ public class BitcoinDao {
 	public static List<CurrencyDTO> selectHistory(int days, int hours) {
 		List<CurrencyDTO> res = new ArrayList<>();
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			PreparedStatement ps;
 			if(days == 0) {
 				ps = conn.prepareStatement(selectLastHours);

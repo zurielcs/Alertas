@@ -12,6 +12,7 @@ import com.mlm.bitcoin.beans.Callback;
 import com.mlm.bitcoin.beans.HistoryResponse;
 import com.mlm.bitcoin.beans.RequestRegisterDevice;
 import com.mlm.bitcoin.commons.DataSource;
+import com.mlm.bitcoin.commons.DbUtils;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.dto.CurrencyDTO;
 
@@ -31,7 +32,8 @@ public class BitcoinRest {
 		Callback response = new Callback();
 		StringBuilder responseBuilder = new StringBuilder();
 		try {
-			Connection conn = DataSource.getInstance().getConnection();
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
 			// conn.createStatement().executeUpdate(createTableSql);
 			PreparedStatement statementCreateVisit = conn.prepareStatement(insertDeviceSql);
 			statementCreateVisit.setString(1, request.getToken());

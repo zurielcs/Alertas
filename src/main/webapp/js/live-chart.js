@@ -11,6 +11,10 @@ function graphPointBTC(x){
 				}
 			});
 			chart.chart.series[0].addPoint([x, y], true, true);
+			console.info(chart.type + ' ' + Math.abs(chart.last - y ) / chart.last);
+			if(Math.abs(chart.last - y ) / chart.last > 0.05)
+				audioElement.play();
+			chart.last = y;
 		});
 	});
 	
@@ -41,7 +45,7 @@ function createLiveChart(type, json){
 //	                        graphPointBTC(series, x);
 	                        graphPointBTC(x);
 	//                        series.addPoint([x, y], true, true);
-	                    }, 1000 * 60);
+	                    }, 1000 * 30);
                 	}
                 }
             }
@@ -99,7 +103,7 @@ function createLiveChart(type, json){
 }
 var chartArray = [];
 
-$.getJSON('https://bitcoin-164116.appspot.com/_ah/api/bitcoin/v1/history?hours=4', function (json) {
+$.getJSON('https://bitcoin-164116.appspot.com/_ah/api/bitcoin/v1/history?hours=6', function (json) {
 	$(document).ready(function () {
 	    Highcharts.setOptions({
 	        global: {
@@ -112,4 +116,7 @@ $.getJSON('https://bitcoin-164116.appspot.com/_ah/api/bitcoin/v1/history?hours=4
 	    chartArray.push(createLiveChart('xrp', json));
 	});
 });
+
+var audioElement = document.createElement('audio');
+audioElement.setAttribute('src', 'https://bitcoin-164116.appspot.com/sound/chart-notification.mp3');
 

@@ -49,7 +49,7 @@ public class GetBTC extends HttpServlet {
 			response.append("<br>ether " + ether.getLast());
 			response.append("<br>ripple " + ether.getLast());
 
-//			BitcoinService.sendPush(bitcoin, ether, ripple, response);
+			BitcoinService.sendPush(bitcoin, ether, ripple, response);
 
 			BitcoinDao.insertBitcoin(bitcoin);
 			BitcoinDao.insertBitcoin(ether);
@@ -68,15 +68,6 @@ public class GetBTC extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
-	}
-
-	public static void main(String args[]) {
-//		String token = "e2kCxVkKRsI:APA91bFvO9l0WyuRCR1mAbXc_k-Kc3MAXu_otmFkLGmVjTsxQ81xcX9h1q1Cv4YeXwauhURy_-R6KatJSBjvsHVcbDE1WK7jVVf1jJA5wzOLKROXacMwh5w69raoJPANQOIM4vyHsbmW";
-//		String pushMsg = "COMPRA BITCOIN";
-//		String content = "{ \"notification\" : { \"title\" : \"Bitcoin Ticker\", \"body\" : \"" + pushMsg
-//				+ "\" }, \"to\":\"" + token + "\" }";
-//		System.out.println(Utils.sendPushApple(content));
-		BitcoinDao.selectDevices();
 	}
 
 }
