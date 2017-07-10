@@ -66,4 +66,17 @@ public class BitcoinRest {
 		}
 		return response;
 	}
+	
+	@ApiMethod(name = "notificationHistory", httpMethod = ApiMethod.HttpMethod.GET, path = "history")
+	public HistoryResponse getNotificationHistory(@Named("days") @DefaultValue("0") int days, @Named("hours") @DefaultValue("0") int hours) {
+		List<CurrencyDTO> list = BitcoinDao.selectNotificationHistory(days, hours);
+		HistoryResponse response = new HistoryResponse();
+		if (list != null && !list.isEmpty()) {
+			response.setSuccess(true);
+			response.setHistory(list);
+		} else {
+			response.setSuccess(false);
+		}
+		return response;
+	}
 }

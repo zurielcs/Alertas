@@ -1,7 +1,5 @@
 package com.mlm.bitcoin.dao;
 
-import java.beans.PropertyVetoException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,13 +9,14 @@ import java.util.List;
 
 import com.mlm.bitcoin.beans.BitsoPayload;
 import com.mlm.bitcoin.commons.Constantes;
-import com.mlm.bitcoin.commons.DataSource;
 import com.mlm.bitcoin.commons.DbUtils;
 import com.mlm.bitcoin.dto.CurrencyDTO;
 import com.mlm.bitcoin.dto.DeviceDTO;
+import com.mlm.bitcoin.dto.NotificationDTO;
 
 public class BitcoinDao {
 	private final static String insertDeviceSql = "INSERT INTO bitcoin (last, bid, ask, high, low, currency, timestamp) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+	private final static String insertNotification = "INSERT INTO notification_history (currency, type, value, message, timestamp) VALUES (?, ?, ?, ?, NOW())";
 	private final static String insertBitacoraSql = "INSERT INTO bitacora (tipo_evento, evento, timestamp) VALUES (?, ?, NOW())";
 
 	// private final static String createTableSql = "CREATE TABLE IF NOT EXISTS
@@ -29,8 +28,11 @@ public class BitcoinDao {
 	private final static String selectMin = "SELECT COALESCE(time_to_sec(timediff(now(), max(timestamp)))/60/60, 999) hrs FROM bitcoin where currency = ? and ask <= ?";
 	private final static String selectMax = "SELECT COALESCE(time_to_sec(timediff(now(), max(timestamp)))/60/60, 999) hrs FROM bitcoin where currency = ? and bid >= ?";
 
-	private final static String selectLastDays = "select truncate(avg(last), 2) value, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') time from bitcoin b where DATE(timestamp) >= DATE_ADD(CURDATE(), INTERVAL - ? DAY) group by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') desc";
-	private final static String selectLastHours = "select last value, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from bitcoin b where timestamp >= NOW() - INTERVAL ? HOUR order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
+	private final static String selectLastDays = "select truncate(avg(last), 2) last, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') time from bitcoin b where DATE(timestamp) >= DATE_ADD(CURDATE(), INTERVAL - ? DAY) group by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:00') desc";
+	private final static String selectLastHours = "select last, bid, ask, currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from bitcoin b where timestamp >= NOW() - INTERVAL ? HOUR order by currency, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
+
+	private final static String selectLastNotificationDays = "select id, type, message, currency, value, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from notification_history nh where timestamp >= NOW() - INTERVAL ? DAY order by DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
+	private final static String selectLastNotificationHours = "select id, type, message, currency, value, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from notification_history nh where timestamp >= NOW() - INTERVAL ? HOUR order by DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
 
 	public static List<DeviceDTO> selectDevices() {
 		List<DeviceDTO> list = new ArrayList<>();
@@ -150,7 +152,64 @@ public class BitcoinDao {
 			while (rs.next()) {
 				CurrencyDTO dto = new CurrencyDTO();
 				dto.setBook(rs.getString("currency"));
-				dto.setValue(rs.getFloat("value"));
+				dto.setLast(rs.getFloat("last"));
+				dto.setAsk(rs.getFloat("ask"));
+				dto.setBid(rs.getFloat("bid"));
+				dto.setCreated_at(rs.getString("time") + ":00:00+00:00");
+				res.add(dto);
+			}
+			ps.close();
+			rs.close();
+			conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+	
+	public static boolean insertNotification(NotificationDTO dto) {
+		try {
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
+			PreparedStatement ps = conn.prepareStatement(insertNotification);
+			ps.setString(1, dto.getBook());
+			ps.setString(2, dto.getType());
+			ps.setFloat(3, dto.getValue());
+			ps.setString(4, dto.getMessage());
+			ps.executeUpdate();
+			ps.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public static List<CurrencyDTO> selectNotificationHistory(int days, int hours) {
+		List<CurrencyDTO> res = new ArrayList<>();
+		try {
+//			Connection conn = DataSource.getInstance().getConnection();
+			Connection conn = DbUtils.getConnection();
+			PreparedStatement ps;
+			if(days == 0) {
+				ps = conn.prepareStatement(selectLastNotificationHours);
+				ps.setInt(1, hours);
+			} else {
+				ps = conn.prepareStatement(selectLastNotificationDays);
+				ps.setInt(1, days);
+			}
+
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				CurrencyDTO dto = new CurrencyDTO();
+				dto.setBook(rs.getString("currency"));
+				dto.setLast(rs.getFloat("last"));
+				dto.setAsk(rs.getFloat("ask"));
+				dto.setBid(rs.getFloat("bid"));
 				dto.setCreated_at(rs.getString("time") + ":00:00+00:00");
 				res.add(dto);
 			}

@@ -1,16 +1,34 @@
 package com.mlm.bitcoin.dto;
 
 public class CurrencyDTO {
-	private Float value;
+	private Float last;
+	private Float bid;
+	private Float ask;
 	private String book;
 	private String created_at;
 
-	public Float getValue() {
-		return value;
+	public Float getLast() {
+		return last;
 	}
 
-	public void setValue(Float value) {
-		this.value = value;
+	public void setLast(Float last) {
+		this.last = last;
+	}
+
+	public Float getBid() {
+		return bid;
+	}
+
+	public void setBid(Float bid) {
+		this.bid = bid;
+	}
+
+	public Float getAsk() {
+		return ask;
+	}
+
+	public void setAsk(Float ask) {
+		this.ask = ask;
 	}
 
 	public String getBook() {

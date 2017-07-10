@@ -12,6 +12,7 @@ import com.mlm.bitcoin.commons.Constantes;
 import com.mlm.bitcoin.commons.Utils;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.dto.DeviceDTO;
+import com.mlm.bitcoin.dto.NotificationDTO;
 
 public class BitcoinService {
 	private static Map<Integer, Date> lastPush = new HashMap<>();
@@ -77,7 +78,12 @@ public class BitcoinService {
 		}
 
 		for (String pushMsg : lstPush) {
-//			BitcoinDao.insertBitacora("PUSH", pushMsg);
+			NotificationDTO notificationDTO =  new NotificationDTO();
+			notificationDTO.setBook("-");
+			notificationDTO.setType("BROADCAST");
+			notificationDTO.setMessage(pushMsg);
+			notificationDTO.setValue(0F);
+			BitcoinDao.insertNotification(notificationDTO);
 			List<DeviceDTO> lst = BitcoinDao.selectDevices();
 			for (DeviceDTO device : lst) {
 				if (device.getPlatform().toUpperCase().contains("IOS")) {
