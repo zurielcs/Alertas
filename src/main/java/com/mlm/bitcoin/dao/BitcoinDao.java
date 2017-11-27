@@ -24,7 +24,7 @@ public class BitcoinDao {
 	// + "AUTO_INCREMENT, value FLOAT(7,2) NOT NULL DEFAULT '0.00', timestamp
 	// DATETIME NOT NULL, PRIMARY KEY (id) )";
 
-	private final static String selectDevices = "SELECT * FROM devices";
+	private final static String selectDevices = "SELECT * FROM devices WHERE activo = 1";
 	private final static String selectMin = "SELECT COALESCE(time_to_sec(timediff(now(), max(timestamp)))/60/60, 999) hrs FROM bitcoin where currency = ? and ask <= ?";
 	private final static String selectMax = "SELECT COALESCE(time_to_sec(timediff(now(), max(timestamp)))/60/60, 999) hrs FROM bitcoin where currency = ? and bid >= ?";
 
@@ -33,7 +33,9 @@ public class BitcoinDao {
 
 	private final static String selectLastNotificationDays = "select id, type, message, currency, value, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from notification_history nh where timestamp >= NOW() - INTERVAL ? DAY order by DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
 	private final static String selectLastNotificationHours = "select id, type, message, currency, value, DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') time from notification_history nh where timestamp >= NOW() - INTERVAL ? HOUR order by DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') desc";
-
+	
+	private final static String disableDevicesQry = "UPDATE devices SET activo = 0 WHERE token = ?";
+	
 	public static List<DeviceDTO> selectDevices() {
 		List<DeviceDTO> list = new ArrayList<>();
 		try {
@@ -189,8 +191,8 @@ public class BitcoinDao {
 		return true;
 	}
 	
-	public static List<CurrencyDTO> selectNotificationHistory(int days, int hours) {
-		List<CurrencyDTO> res = new ArrayList<>();
+	public static List<NotificationDTO> selectNotificationHistory(int days, int hours) {
+		List<NotificationDTO> res = new ArrayList<>();
 		try {
 //			Connection conn = DataSource.getInstance().getConnection();
 			Connection conn = DbUtils.getConnection();
@@ -205,11 +207,12 @@ public class BitcoinDao {
 
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
-				CurrencyDTO dto = new CurrencyDTO();
+				NotificationDTO dto = new NotificationDTO();
+				dto.setId(rs.getInt("id"));
+				dto.setType(rs.getString("type"));
+				dto.setMessage(rs.getString("message"));
 				dto.setBook(rs.getString("currency"));
-				dto.setLast(rs.getFloat("last"));
-				dto.setAsk(rs.getFloat("ask"));
-				dto.setBid(rs.getFloat("bid"));
+				dto.setValue(rs.getFloat("value"));
 				dto.setCreated_at(rs.getString("time") + ":00:00+00:00");
 				res.add(dto);
 			}
@@ -220,5 +223,22 @@ public class BitcoinDao {
 			e.printStackTrace();
 		}
 		return res;
+	}
+	
+	public static String disableDevices(List<String> tokenList){
+		try {
+			Connection conn = DbUtils.getConnection();
+			for (String token : tokenList) {
+				PreparedStatement ps = conn.prepareStatement(disableDevicesQry);
+				ps.setString(1, token);
+				ps.executeUpdate();
+				ps.close();
+			}
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		return "success";
 	}
 }

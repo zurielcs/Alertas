@@ -10,5 +10,9 @@ public class Constantes {
 	
 	public static final String CURRENCY_BTC = "btc_mxn"; 
 	public static final String CURRENCY_ETH = "eth_mxn"; 
-	public static final String CURRENCY_RIP = "xrp_mxn"; 
+	public static final String CURRENCY_RIP = "xrp_mxn";
+	
+	public static final String PUSH_TITLE = "Bitcoin Ticker";
+
+
 }

@@ -7,18 +7,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.appengine.repackaged.com.google.gson.Gson;
 import com.mlm.bitcoin.beans.BitsoPayload;
 import com.mlm.bitcoin.commons.Constantes;
 import com.mlm.bitcoin.commons.Utils;
 import com.mlm.bitcoin.dao.BitcoinDao;
 import com.mlm.bitcoin.dto.DeviceDTO;
 import com.mlm.bitcoin.dto.NotificationDTO;
+import com.mlm.bitcoin.push.beans.PushCallback;
+import com.mlm.bitcoin.push.beans.PushNotification;
+import com.mlm.bitcoin.push.beans.PushPayload;
 
 public class BitcoinService {
 	private static Map<Integer, Date> lastPush = new HashMap<>();
+	
+	public static void main(String[] args){
+		String token = "123123";
+		String pushMsg = "Mensaje de push";
+		String content = "{ \"notification\" : { \"title\" : \"Bitcoin Ticker\", \"sound\" : \"default\", \"body\" : \""
+				+ pushMsg  + "\" }, \"data\" : { \"title\" : \"Bitcoin Ticker\", \"body\" : \"" + pushMsg
+				+ "\" }, \"to\":\"" + token + "\" }";
+		System.out.println(content);
+		
+		PushNotification push = new PushNotification();
+		push.setTo(token);
+		PushPayload payload = new PushPayload();
+		payload.setTitle("Bitcoin Ticker");
+		payload.setSound("default");
+		payload.setBody(pushMsg);
+		push.setData(payload);
+		push.setNotification(payload);
+		System.out.println(new Gson().toJson(push));
+		
+		String res = "{\"multicast_id\": 5297329502807218617,\"success\": 1,\"failure\": 0,\"canonical_ids\": 0,\"results\": [{\"message_id\": \"0:1511748909002896%79350c6979350c69\"}]}";
+		PushCallback callback = new Gson().fromJson(res, PushCallback.class);
+		System.out.println(new Gson().toJson(callback));
+	}
 
 	public static boolean sendPush(BitsoPayload bitcoin, BitsoPayload ether, BitsoPayload ripple, StringBuilder response) {
-		List<String> lstPush = new ArrayList<String>();
+		List<PushPayload> lstPush = new ArrayList<PushPayload>();
 		Float hsr;
 		Date now = new Date();
 
@@ -27,7 +54,10 @@ public class BitcoinService {
 			response.append("<br>Min BTC hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(1, now);
-				lstPush.add("Compra Bitcoin a " + bitcoin.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas");
+				String message = "Compra Bitcoin a " + bitcoin.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_BTC,
+						Constantes.TYPE_SELECT_MIN, bitcoin.getAskFloat());
+				lstPush.add(push);
 			}
 
 		}
@@ -37,7 +67,10 @@ public class BitcoinService {
 			response.append("<br>Max BTC hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(2, now);
-				lstPush.add("Vende Bitcoin a " + bitcoin.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas");
+				String message = "Vende Bitcoin a " + bitcoin.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_BTC,
+						Constantes.TYPE_SELECT_MAX, bitcoin.getBidFloat());
+				lstPush.add(push);
 			}
 		}
 
@@ -46,7 +79,10 @@ public class BitcoinService {
 			response.append("<br>Min ETH hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(3, now);
-				lstPush.add("Compra Ether a " + ether.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas");
+				String message = "Compra Ether a " + ether.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_ETH,
+						Constantes.TYPE_SELECT_MIN, ether.getAskFloat());
+				lstPush.add(push);
 			}
 		}
 
@@ -55,7 +91,10 @@ public class BitcoinService {
 			response.append("<br>Max ETH hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(4, now);
-				lstPush.add("Vende Ether a " + ether.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas");
+				String message = "Vende Ether a " + ether.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_ETH,
+						Constantes.TYPE_SELECT_MAX, ether.getBidFloat());
+				lstPush.add(push);
 			}
 		}
 		
@@ -64,7 +103,10 @@ public class BitcoinService {
 			response.append("<br>Min RIP hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(5, now);
-				lstPush.add("Compra Ripple a " + ripple.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas");
+				String message = "Compra Ripple a " + ripple.getAsk() + ", el valor mas bajo en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_RIP,
+						Constantes.TYPE_SELECT_MIN, ripple.getAskFloat());
+				lstPush.add(push);
 			}
 		}
 
@@ -73,38 +115,45 @@ public class BitcoinService {
 			response.append("<br>Max RIP hrs " + hsr);
 			if (hsr > 9) {
 				lastPush.put(6, now);
-				lstPush.add("Vende Ripple a " + ripple.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas");
+				String message = "Vende Ripple a " + ripple.getBid() + ", el valor mas alto en " + Math.round(hsr) + " horas";
+				PushPayload push = PushPayload.build(Constantes.PUSH_TITLE, message, Constantes.CURRENCY_RIP,
+						Constantes.TYPE_SELECT_MAX, ripple.getBidFloat());
+				lstPush.add(push);
 			}
 		}
-
-		for (String pushMsg : lstPush) {
+		Gson gson = new Gson();
+		for (PushPayload payload : lstPush) {
 			NotificationDTO notificationDTO =  new NotificationDTO();
-			notificationDTO.setBook("-");
-			notificationDTO.setType("BROADCAST");
-			notificationDTO.setMessage(pushMsg);
+			notificationDTO.setBook(payload.getBook());
+			notificationDTO.setType(payload.getType());
+			notificationDTO.setMessage(payload.getBody());
 			notificationDTO.setValue(0F);
 			BitcoinDao.insertNotification(notificationDTO);
 			List<DeviceDTO> lst = BitcoinDao.selectDevices();
 			for (DeviceDTO device : lst) {
+				PushNotification push = new PushNotification();
+				push.setTo(device.getToken());
+				String pushResponse;
 				if (device.getPlatform().toUpperCase().contains("IOS")) {
-					String content = "{ \"notification\" : { \"title\" : \"Bitcoin Ticker\", \"sound\" : \"default\", \"body\" : \""
-							+ pushMsg + "\" }, \"data\" : { \"title\" : \"Bitcoin Ticker\", \"body\" : \"" + pushMsg
-							+ "\" }, \"to\":\"" + device.getToken() + "\" }";
-					response.append("<br>IOS " + Utils.sendPushApple(content));
+					push.setData(payload);
+					push.setNotification(payload);
+					String content = gson.toJson(push);
+					pushResponse = Utils.sendPushApple(content);
+					response.append("<br>IOS " + pushResponse);
 				} else {
-					String content = "{ \"data\" : { \"title\" : \"Bitcoin Ticker\", \"body\" : \"" + pushMsg
-							+ "\" }, \"to\":\"" + device.getToken() + "\" }";
-					response.append("<br>ANDROID " + Utils.sendPushAndroid(content));
+					push.setData(payload);
+					String content = gson.toJson(push);
+					pushResponse = Utils.sendPushAndroid(content);
+					response.append("<br>ANDROID " + pushResponse);
+				}
+				PushCallback callback = new Gson().fromJson(pushResponse, PushCallback.class);
+				if(callback.getFailure() > 0){
+					List<String> tokenList = new ArrayList<>();
+					tokenList.add(push.getTo());
+					BitcoinDao.disableDevices(tokenList);
 				}
 			}
 		}
-
-//		String pushMsg = "Vende Ether a " + ether + ", el mas caro en " + Math.round(1) + " horas";
-//		String token = "eMNB-r-A3ow:APA91bFr63JDcZ0n9SzMhD-LC2okvpeuF4qBoV2JvgXfameuIQAOoM1FWKCXL-jMmZbvTfdG2fH6o2qEJkUdtWjNdqh02pQmq0iAgayQkwJDxMKwAiBVIAzn9B1c0lBRIR5lX7D7jkTK";
-//		String content = "{ \"notification\" : { \"title\" : \"Bitcoin Ticker\", \"sound\" : \"default\", \"body\" : \""
-//				+ pushMsg + "\" }, \"data\" : { \"title\" : \"Bitcoin Ticker\", \"body\" : \"" + pushMsg
-//				+ "\" }, \"to\":\"" + token  + "\" }";
-//		response.append("<br>ANDROID " + Utils.sendPushAndroid(content));
 
 		return true;
 	}

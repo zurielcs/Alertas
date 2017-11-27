@@ -42,7 +42,6 @@ public class Utils {
 	public static String sendPost(String url, String key, String content) throws Exception {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		// HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
 		// add request header
 		con.setRequestMethod("POST");
